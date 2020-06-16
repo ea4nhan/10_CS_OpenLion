@@ -22,9 +22,11 @@ using DevExpress.Data.Filtering;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 using System.Diagnostics;
 using System.Reflection;
+using DevExpress.XtraCharts;
 
 namespace OPL
 {
+
     public partial class PowerMainForm : DevExpress.XtraEditors.XtraForm//DevExpress.XtraBars.Ribbon.RibbonForm
     {
         protected static DevExpress.LookAndFeel.DefaultLookAndFeel defaultLookAndFeel = new DevExpress.LookAndFeel.DefaultLookAndFeel();
@@ -289,13 +291,35 @@ namespace OPL
                 Directory.CreateDirectory(".\\Data\\");
                 Directory.CreateDirectory(".\\User\\");
                 Directory.CreateDirectory(".\\Save\\");
+                Directory.CreateDirectory(".\\Save\\BackUp");
             }
-            catch { };
+            catch
+            {
+                try { Directory.CreateDirectory(".\\Save\\BackUp"); } catch{ }
+            };
 
             saveFilePath_N = HyqIni.GetINI("Main","saveFilePath_N","日常记录",saveFilePath_M);
             saveFilePath_D = HyqIni.GetINI("Main","saveFilePath_D",@".\Save\日常记录.ini",saveFilePath_M);
             curSelectionOPL = HyqIni.GetINI("Main", "curSelectionOPL", -1, saveFilePath_M);
             sort1Flag = false;
+
+            //备份
+            if (File.Exists(saveFilePath_D))//必须判断要复制的文件是否存在
+            {
+                DateTime dt = DateTime.Now;
+                string targetPath = @".\Save\BackUp\" + saveFilePath_N + "_" 
+                    + dt.Year.ToString() + "_" + dt.Month.ToString() + "_" + dt.Day.ToString() + "_" +
+                    dt.Hour.ToString() + "_" + dt.Minute.ToString() + "_" + dt.Second.ToString()
+                    + ".ini";
+                try
+                {
+                    File.Copy(saveFilePath_D, targetPath, true);
+                }
+                catch
+                {
+                    MessageUtil.ShowWarning("Auto backup failed");
+                }
+            }
 
             #region 增加Visbile控件集合
             /*所有输入框控件*/
@@ -456,6 +480,7 @@ namespace OPL
             this.AllowDrop = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.ControlBox = true;
+
             VisibleIconReset();
         }
         #endregion
@@ -2234,6 +2259,17 @@ namespace OPL
                 OpenListView_ColumnsHeader_Initial();
                 OpenListView_GetDetailIni();
             }
+            else if (ListPanel.SelectedPageIndex == 2)
+            {
+                DoAddOPL.Enabled = false;
+                DoAddPlan.Enabled = false;
+                DoDelPlan.Enabled = false;
+                DoClose.Enabled = false;
+                DoAchieve.Enabled = false;
+
+                //Initial
+                UpdateChartControl1();
+            }
             else
             {
                 DoAddOPL.Enabled = false;
@@ -2248,6 +2284,101 @@ namespace OPL
             //OpenListView.ClearSorting();
             //排序
 
+        }
+        #endregion
+
+        #region Chart图表函数 chartControl1-For All OPL
+        private void UpdateChartControl1()
+        {
+            // CHART CONTROL I
+            // Create a pie series.
+            Series series1 = new Series("Pie Series 1", DevExpress.XtraCharts.ViewType.Pie);
+
+            // data collection
+            string[] filespath;
+            string[] Items;
+            string[] Items2 = HyqIni.GetItems("CPL", saveFilePath_D);
+            try { filespath = Directory.GetFiles(@".\Save\"); }
+            catch { return; }
+            HYQFileInfoList fileList = new HYQFileInfoList(filespath);
+
+            // Populate the series with points.
+            foreach (FileInfoWithIcon file in fileList.list)
+            {
+                string fileName = System.IO.Path.GetFileName(file.fileInfo.Name);//Split('.')[0];
+                Items = HyqIni.GetItems("OPL", @".\Save\" + fileName);
+                series1.Points.Add(new SeriesPoint(System.IO.Path.GetFileNameWithoutExtension(file.fileInfo.Name), Items.Count()));
+            }
+
+            // Add the series to the chart.
+            chtCtrl1.Series.Clear();
+            chtCtrl1.Series.Add(series1);
+
+            // Adjust the value numeric options of the series.
+            ((PiePointOptions)series1.Label.PointOptions).PercentOptions.ValueAsPercent = false;
+            ((PiePointOptions)series1.Label.PointOptions).ValueNumericOptions.Format = NumericFormat.Number;
+            ((PiePointOptions)series1.Label.PointOptions).ValueNumericOptions.Precision = 0;
+            series1.LegendPointOptions.PointView = PointView.ArgumentAndValues;
+
+            // Adjust the view-type-specific options of the series.
+            //((Pie3DSeriesView)series1.View).Depth = 5;
+            ((PieSeriesView)series1.View).ExplodedPoints.Add(series1.Points[0]);
+            ((PieSeriesView)series1.View).ExplodedDistancePercentage = 30;
+
+            // Access the diagram's options.
+            //((SimpleDiagram3D)chtCtrl1.Diagram).RotationType = RotationType.UseAngles;
+            //((SimpleDiagram3D)chtCtrl1.Diagram).RotationAngleX = -0;
+
+            // Add a title to the chart and hide the legend.
+            ChartTitle chartTitle1 = new ChartTitle();
+            chartTitle1.Text = "所有OPL未关问题统计";
+            chartTitle1.Font = new System.Drawing.Font("STXihei", 14);
+            chartTitle1.TextColor = Color.Black;
+            chtCtrl1.Titles.Add(chartTitle1);
+            chtCtrl1.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True;
+
+            // CHART CONTROL II
+            int col_s = 9;//"状态" + Environment.NewLine + "Sta.";
+            int cnt_D = 0, cnt_O = 0, Cnt_C = 0;
+            int startrow = 1; //起始行为第2行
+            for (int i = startrow; i < startrow + this.OpenListView.DataRowCount; i++)
+            {
+                string Txt_Sts = this.OpenListView.GetRowCellValue(i - startrow, this.OpenListView.Columns[col_s]).ToString();
+                if (Txt_Sts == "Delay") cnt_D++;
+                if (Txt_Sts == "Open") cnt_O++;
+                if (Txt_Sts == "Close") Cnt_C++;
+            }
+
+            chtCtrl2.Series.Clear();
+            Series series = new Series(null, DevExpress.XtraCharts.ViewType.Bar);
+            SeriesPoint point;
+            //创建条型条形图
+            point = new SeriesPoint("Delay", cnt_D);
+            series.Points.Add(point);
+            point = new SeriesPoint("Open", cnt_O);
+            series.Points.Add(point);
+            point = new SeriesPoint("Close", Cnt_C);
+            series.Points.Add(point);
+            point = new SeriesPoint("Achieved", Items2.Count());
+            series.Points.Add(point);
+            series.Points[0].Color = Color.Red;
+            series.Points[1].Color = Color.Yellow;
+            series.Points[2].Color = Color.Blue;
+            series.Points[3].Color = Color.Green;
+            series.ArgumentScaleType = ScaleType.Qualitative;
+            series.ArgumentDataMember = "OPL Status";//x轴
+            series.ValueDataMembers[0] = "Number";//Y轴
+
+            //显示标注标签
+            series.LabelsVisibility = DevExpress.Utils.DefaultBoolean.True;
+            chtCtrl2.Series.Add(series);
+            
+            //图标题
+            ChartTitle chartTitle = new ChartTitle();
+            chartTitle.Text = "当前OPL状态分布";
+            chartTitle.Font = new System.Drawing.Font("STXihei", 14); 
+            chartTitle.TextColor = Color.Black;
+            chtCtrl2.Titles.Add(chartTitle);
         }
         #endregion
 
@@ -2753,7 +2884,7 @@ namespace OPL
                 try
                 {
                     wb = new Workbook(sourcepath);
-                    ws = wb.Worksheets["OPL"];
+                    ws = wb.Worksheets[8];
                 }
                 catch
                 {

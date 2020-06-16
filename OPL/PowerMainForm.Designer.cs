@@ -90,6 +90,9 @@
             this.OpenListView = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.ListPanelPage2 = new DevExpress.XtraBars.Navigation.TabNavigationPage();
+            this.tabNavigationPage3 = new DevExpress.XtraBars.Navigation.TabNavigationPage();
+            this.chtCtrl2 = new DevExpress.XtraCharts.ChartControl();
+            this.chtCtrl1 = new DevExpress.XtraCharts.ChartControl();
             this.TxtB_FileList = new DevExpress.XtraEditors.ImageListBoxControl();
             this.CMS_FileList = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.CMS_FileList_OpenFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -156,6 +159,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.OpenListView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).BeginInit();
             this.ListPanelPage2.SuspendLayout();
+            this.tabNavigationPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chtCtrl2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chtCtrl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TxtB_FileList)).BeginInit();
             this.CMS_FileList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TxtB_EDate2.Properties)).BeginInit();
@@ -195,7 +201,7 @@
             this.ArchieveList.MainView = this.ArchieveListView;
             this.ArchieveList.MenuManager = this.ribbon;
             this.ArchieveList.Name = "ArchieveList";
-            this.ArchieveList.Size = new System.Drawing.Size(1577, 519);
+            this.ArchieveList.Size = new System.Drawing.Size(1599, 577);
             this.ArchieveList.TabIndex = 3;
             this.ArchieveList.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.ArchieveListView,
@@ -689,13 +695,15 @@
             // 
             this.ListPanel.Controls.Add(this.ListPanelPage1);
             this.ListPanel.Controls.Add(this.ListPanelPage2);
+            this.ListPanel.Controls.Add(this.tabNavigationPage3);
             this.ListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ListPanel.Font = new System.Drawing.Font("华文细黑", 11F);
             this.ListPanel.Location = new System.Drawing.Point(0, 0);
             this.ListPanel.Name = "ListPanel";
             this.ListPanel.Pages.AddRange(new DevExpress.XtraBars.Navigation.NavigationPageBase[] {
             this.ListPanelPage1,
-            this.ListPanelPage2});
+            this.ListPanelPage2,
+            this.tabNavigationPage3});
             this.ListPanel.RegularSize = new System.Drawing.Size(1599, 577);
             this.ListPanel.SelectedPage = this.ListPanelPage1;
             this.ListPanel.Size = new System.Drawing.Size(1599, 577);
@@ -755,7 +763,40 @@
             this.ListPanelPage2.Caption = "Archieve List";
             this.ListPanelPage2.Controls.Add(this.ArchieveList);
             this.ListPanelPage2.Name = "ListPanelPage2";
-            this.ListPanelPage2.Size = new System.Drawing.Size(1577, 519);
+            this.ListPanelPage2.Size = new System.Drawing.Size(1599, 577);
+            // 
+            // tabNavigationPage3
+            // 
+            this.tabNavigationPage3.Caption = "Chart Panel";
+            this.tabNavigationPage3.Controls.Add(this.chtCtrl2);
+            this.tabNavigationPage3.Controls.Add(this.chtCtrl1);
+            this.tabNavigationPage3.Name = "tabNavigationPage3";
+            this.tabNavigationPage3.PageVisible = false;
+            this.tabNavigationPage3.Size = new System.Drawing.Size(1599, 577);
+            // 
+            // chtCtrl2
+            // 
+            this.chtCtrl2.BorderOptions.Visibility = DevExpress.Utils.DefaultBoolean.False;
+            this.chtCtrl2.DataBindings = null;
+            this.chtCtrl2.Dock = System.Windows.Forms.DockStyle.Right;
+            this.chtCtrl2.Legend.Name = "Default Legend";
+            this.chtCtrl2.Location = new System.Drawing.Point(800, 0);
+            this.chtCtrl2.Name = "chtCtrl2";
+            this.chtCtrl2.SeriesSerializable = new DevExpress.XtraCharts.Series[0];
+            this.chtCtrl2.Size = new System.Drawing.Size(799, 577);
+            this.chtCtrl2.TabIndex = 1;
+            // 
+            // chtCtrl1
+            // 
+            this.chtCtrl1.BorderOptions.Visibility = DevExpress.Utils.DefaultBoolean.False;
+            this.chtCtrl1.DataBindings = null;
+            this.chtCtrl1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.chtCtrl1.Legend.Name = "Default Legend";
+            this.chtCtrl1.Location = new System.Drawing.Point(0, 0);
+            this.chtCtrl1.Name = "chtCtrl1";
+            this.chtCtrl1.SeriesSerializable = new DevExpress.XtraCharts.Series[0];
+            this.chtCtrl1.Size = new System.Drawing.Size(778, 577);
+            this.chtCtrl1.TabIndex = 0;
             // 
             // TxtB_FileList
             // 
@@ -1227,7 +1268,7 @@
             this.Name = "PowerMainForm";
             this.ShowIcon = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
-            this.Text = "OpenLion v3.8";
+            this.Text = "OpenLion v3.9";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.PowerMainForm_Load);
             this.SizeChanged += new System.EventHandler(this.PowerMainForm_SizeChanged);
@@ -1261,6 +1302,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.OpenListView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView2)).EndInit();
             this.ListPanelPage2.ResumeLayout(false);
+            this.tabNavigationPage3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chtCtrl2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chtCtrl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TxtB_FileList)).EndInit();
             this.CMS_FileList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.TxtB_EDate2.Properties)).EndInit();
@@ -1397,5 +1441,8 @@
         private DevExpress.XtraEditors.TextEdit TxtB_No_Fake;
         private DevExpress.XtraEditors.PictureEdit Logo;
         private System.Windows.Forms.Label TxtB_Title;
+        private DevExpress.XtraBars.Navigation.TabNavigationPage tabNavigationPage3;
+        private DevExpress.XtraCharts.ChartControl chtCtrl2;
+        private DevExpress.XtraCharts.ChartControl chtCtrl1;
     }
 }
